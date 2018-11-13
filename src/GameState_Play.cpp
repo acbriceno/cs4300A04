@@ -187,8 +187,45 @@ void GameState_Play::sMovement()
 
 void GameState_Play::sAI()
 {
-    // Implement Follow behavior of NPCS
-    // Implement Patrol behavior of NPCS
+	// Implement Follow behavior of NPCS
+
+	// Implement Patrol behavior of NPCS
+
+	for (auto e : m_entityManager.getEntities("npc"))
+	{
+		if (e->hasComponent<CPatrol>())
+		{
+			auto ePatrol = e->getComponent<CPatrol>();
+
+
+
+			Vec2 point = ePatrol->positions[ePatrol->currentPosition];
+			float x = (point.x - e->getComponent<CTransform>()->pos.x);
+			float y = (point.y - e->getComponent<CTransform>()->pos.y);
+			float z = sqrt(x*x + y * y);
+
+			if (z <= 5)
+			{
+				ePatrol->currentPosition += 1;
+				if (ePatrol->positions.size() <= ePatrol->currentPosition)
+				{
+					ePatrol->currentPosition = 0;
+				}
+				Vec2 point = ePatrol->positions[ePatrol->currentPosition];
+			}
+
+
+
+
+
+
+
+		}
+		else
+		{
+
+		}
+	}
 }
 
 void GameState_Play::sLifespan()
