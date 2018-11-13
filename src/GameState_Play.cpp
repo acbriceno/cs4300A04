@@ -67,13 +67,11 @@ void GameState_Play::loadLevel(const std::string & filename)
 				for (int i = 0; i < n; i++)
 				{
 					fin >> x >> y;
-					std::cout << "X:" << x << " Y: " << y;
 					Vec2 spot(x*64 + 32, y*64 + 32);
 					Vec2 spotpos(room.x*m_game.window().getSize().x + spot.x, room.y*m_game.window().getSize().y + spot.y);
 					pos.push_back(spotpos);
 				}
 				npc->addComponent<CPatrol>(pos, S);
-				std::cout << " next\n";
 			}
 			else{npc->addComponent<CFollowPlayer>(pos, S);}
 		}
@@ -89,7 +87,6 @@ void GameState_Play::spawnPlayer()
     m_player->addComponent<CTransform>(Vec2(640, 384));
     m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("StandDown"), true);
     m_player->addComponent<CInput>();
-    // New element to CTransform: 'facing', to keep track of where the player is facing
     m_player->getComponent<CTransform>()->facing = Vec2(0, 1);
 	Vec2 BB(m_playerConfig.CX, m_playerConfig.CY);
 	m_player->addComponent<CBoundingBox>(BB, false, false);
@@ -98,27 +95,13 @@ void GameState_Play::spawnPlayer()
 
 void GameState_Play::spawnSword(std::shared_ptr<Entity> entity)
 {
-    auto eTransform = entity->getComponent<CTransform>();
+	auto eTransform = entity->getComponent<CTransform>();
 
-    auto sword = m_entityManager.addEntity ("sword");
+	auto sword = m_entityManager.addEntity("sword");
 	sword->addComponent<CTransform>(eTransform->pos + eTransform->facing * 64);
-	
+	sword->getComponent<CTransform>()->facing = eTransform->facing;
+	sword->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("SwordUp").getSize(), false, false);
 	sword->addComponent<CLifeSpan>(150);
-
-	if (m_player->getComponent<CTransform>()->facing.x == 0)
-	{
-		if (m_player->getComponent<CTransform>()->facing.y == 1)
-		{
-			sword->getComponent<CTransform>()->scale.y = -1;
-			sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
-		}
-		else{ sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true); }
-	}
-	else
-	{
-		sword->getComponent<CTransform>()->scale = m_player->getComponent<CTransform>()->scale;
-		sword->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true);
-	}
 }
 
 void GameState_Play::update()
@@ -155,10 +138,6 @@ void GameState_Play::sMovement()
 		hor = true;
 		pTransform->facing = Vec2(1,0);
 		m_player->getComponent<CState>()->state = "Run";
-		//if(m_player->getComponent<CAnimation>()->animation.getName() != "RunRight")
-		//{
-		//	m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation("RunRight"), true);
-		//}
 	}
 	if (pInput->left)
 	{
@@ -191,18 +170,18 @@ void GameState_Play::sMovement()
 		e->getComponent<CTransform>()->pos += e->getComponent<CTransform>()->speed;
 	}
 
+	for (auto e : m_entityManager.getEntities("sword"))
+	{
+		pInput->shoot = false;
+		e->getComponent<CTransform>()->facing = pTransform->facing;
+		e->getComponent<CTransform>()->pos = pTransform->pos + Vec2(64, 64)*pTransform->facing;
+		m_player->getComponent<CState>()->state = "Atk";
+	}
+
 	if (pInput->shoot && pInput->canShoot)
 	{
-		bool noSword = true;
-		for (auto e : m_entityManager.getEntities("sword"))
-		{
-			noSword = true;
-		}
-		if (noSword)
-		{
-			pInput->canShoot = false;
-			spawnSword(m_player);
-		}
+		pInput->canShoot = false;
+		spawnSword(m_player);
 	}
 }
 
@@ -234,7 +213,7 @@ void GameState_Play::sCollision()
 	for (auto tile : m_entityManager.getEntities("tile"))
 	{
 		Vec2 overlap = Physics::GetOverlap(tile, m_player);
-		if (overlap.x > 0 && overlap.y > 0)
+		if (overlap.x > 0 && overlap.y > 0 && tile->getComponent<CBoundingBox>()->blockMove)
 		{
 			m_player->getComponent<CTransform>()->pos -= (m_player->getComponent<CTransform>()->facing * overlap);
 		}
@@ -244,11 +223,7 @@ void GameState_Play::sCollision()
 void GameState_Play::sAnimation()
 {
 	auto pTransform = m_player->getComponent<CTransform>();
-	for (auto e : m_entityManager.getEntities("sword"))
-	{
-		m_player->getComponent<CState>()->state = "Atk";
-	}
-
+	
 	std::string animation = m_player->getComponent<CState>()->state;
 
 	if (pTransform->facing.x == 0)
@@ -270,7 +245,23 @@ void GameState_Play::sAnimation()
 	if (m_player->getComponent<CAnimation>()->animation.getName() != animation)
 	{
 		m_player->addComponent<CAnimation>(m_game.getAssets().getAnimation(animation), true);
+	}
 
+	for (auto e : m_entityManager.getEntities("sword"))
+	{
+		e->getComponent<CTransform>()->scale = Vec2(1, 1);
+		if (abs(e->getComponent<CTransform>()->facing.y) == 1) 
+		{
+			e->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordUp"), true);
+			e->getComponent<CTransform>()->scale.y = e->getComponent<CTransform>()->facing.y * -1;
+		}
+		else 
+		{
+			e->addComponent<CAnimation>(m_game.getAssets().getAnimation("SwordRight"), true); 
+			e->getComponent<CTransform>()->scale.x = e->getComponent<CTransform>()->facing.x;
+		}
+
+		
 	}
 
 	for (auto e : m_entityManager.getEntities())
@@ -279,8 +270,6 @@ void GameState_Play::sAnimation()
 
 		if (e->getComponent<CAnimation>()->animation.hasEnded() && !(e->getComponent<CAnimation>()->repeat))
 		{
-
-			std::cout << e->getComponent<CAnimation>()->animation.getName();
 			e->destroy();
 		}
 	}
@@ -297,7 +286,6 @@ void GameState_Play::sUserInput()
         {
             m_game.quit();
         }
-        // this event is triggered when a key is pressed
         if (event.type == sf::Event::KeyPressed)
         {
             switch (event.key.code)
