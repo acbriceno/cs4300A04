@@ -23,9 +23,10 @@ public:
     void operator += (const Vec2 & rhs);
     void operator -= (const Vec2 & rhs);
     void operator *= (const float & val);
-	void operator *= (const Vec2 & rhs);
+    void operator *= (const Vec2 & rhs);
     void operator /= (const float & val);
 
     Vec2 abs() const;
+    float cross(const Vec2 & rhs) const;
     float dist(const Vec2 & rhs) const;
 };
