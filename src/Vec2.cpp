@@ -80,7 +80,11 @@ void Vec2::operator /= (const float & val)
     y /= val;
 }
 
-
+float Vec2::cross(const Vec2 & rhs) const
+{
+	
+	return x * rhs.y - y * rhs.x;
+}
 
 float Vec2::dist(const Vec2 & rhs) const
 {
