@@ -360,6 +360,15 @@ void GameState_Play::sRender()
     m_game.window().clear(sf::Color(255, 192, 122));
 
     // TODO: set the window view correctly
+    sf::View view(sf::FloatRect(0.f, 0.f, m_game.window().getSize().x, m_game.window().getSize().y));
+    if (m_follow)
+    {
+        view.setCenter(sf::Vector2f(m_player->getComponent<CTransform>()->pos.x, m_player->getComponent<CTransform>()->pos.y));
+    }
+    else
+    {
+    }
+    m_game.window().setView(view);
         
     // draw all Entity textures / animations
     if (m_drawTextures)
