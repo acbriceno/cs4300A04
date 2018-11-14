@@ -187,44 +187,63 @@ void GameState_Play::sMovement()
 
 void GameState_Play::sAI()
 {
-	// Implement Follow behavior of NPCS
-
-	// Implement Patrol behavior of NPCS
-
+	
 	for (auto e : m_entityManager.getEntities("npc"))
 	{
+		auto eTransform = e->getComponent<CTransform>();
+		Vec2 dest(0, 0);
+		float speed = 0;
+		eTransform->speed = Vec2(0, 0);
 		if (e->hasComponent<CPatrol>())
 		{
 			auto ePatrol = e->getComponent<CPatrol>();
+			speed = ePatrol->speed;
+			
+			dest = ePatrol->positions[ePatrol->currentPosition];
 
-
-
-			Vec2 point = ePatrol->positions[ePatrol->currentPosition];
-			float x = (point.x - e->getComponent<CTransform>()->pos.x);
-			float y = (point.y - e->getComponent<CTransform>()->pos.y);
-			float z = sqrt(x*x + y * y);
-
-			if (z <= 5)
+			if (eTransform->pos.dist(dest) <= 5)
 			{
 				ePatrol->currentPosition += 1;
 				if (ePatrol->positions.size() <= ePatrol->currentPosition)
 				{
 					ePatrol->currentPosition = 0;
 				}
-				Vec2 point = ePatrol->positions[ePatrol->currentPosition];
+				dest = ePatrol->positions[ePatrol->currentPosition];
 			}
-
-
-
-
-
-
-
 		}
 		else
 		{
-
+			bool cansee = true;
+			speed = e->getComponent<CFollowPlayer>()->speed;
+			for (auto t : m_entityManager.getEntities())
+			{
+				if (t->getComponent<CBoundingBox>()->blockVision && t != e && t != m_player)
+				{
+					if (Physics::EntityIntersect(m_player->getComponent<CTransform>()->pos, eTransform->pos, t))
+					{
+						cansee = false;
+						break;
+					}
+				}
+			}
+			
+			if (cansee) { dest = m_player->getComponent<CTransform>()->pos; }
+			else { dest = e->getComponent<CFollowPlayer>()->home; }
 		}
+		if (eTransform->pos.dist(dest) <= 5)
+		{
+			eTransform->speed = Vec2(0, 0);
+		}
+		else
+		{
+			float dx = dest.x - eTransform->pos.x;
+			float dy = dest.y - eTransform->pos.y;
+			float ang = atan2(dy, dx);
+			float vx = speed*cos(ang);
+			float vy = speed*sin(ang);
+			eTransform->speed = Vec2(vx, vy);
+		}
+
 	}
 }
 
