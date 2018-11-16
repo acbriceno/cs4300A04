@@ -395,6 +395,67 @@ void GameState_Play::sRender()
 {
     m_game.window().clear(sf::Color(255, 192, 122));
 
+    roomY =0;
+    roomX = 0;
+    
+    switch ((int)m_player->getComponent<CTransform>()->pos.x) {
+        case 0 ... 1280:
+            roomX = 0;
+            break;
+        case 1281 ... 2561:
+            roomX = 1;
+            break;
+        case 2562 ... 3842:
+            roomX = 2;
+            break;
+        case 3843 ... 5123:
+            roomX = 3;
+            break;
+        case -1280 ... -1:
+            roomX = -1;
+            break;
+        case -2561 ... -1281:
+            roomX = -2;
+            break;
+        case -3842 ... -2562:
+            roomX = -3;
+            break;
+            
+            
+        default:
+            roomX = 0;
+    }
+    
+    switch ((int)m_player->getComponent<CTransform>()->pos.y) {
+        case 0 ... 768:
+            roomY = 0;
+            break;
+        case 769 ... 1537:
+            roomY = 1;
+            break;
+        case 1538 ... 2306:
+            roomY = 2;
+            break;
+        case 2307 ... 3075:
+            roomY = 3;
+            break;
+        case -768 ... -1:
+            roomY = -1;
+            break;
+        case -1537 ... -769:
+            roomY = -2;
+            break;
+        case -2306 ... -1538:
+            roomY = -3;
+            break;
+
+            
+        default:
+            roomX = 0;
+            roomY = 0;
+    }
+
+    
     // TODO: set the window view correctly
     sf::View view(sf::FloatRect(0.f, 0.f, m_game.window().getSize().x, m_game.window().getSize().y));
     if (m_follow)
@@ -403,9 +464,15 @@ void GameState_Play::sRender()
     }
     else
     {
-    }
-    m_game.window().setView(view);
+      
+            int centerX =m_game.window().getSize().x/2 + (roomX*  m_game.window().getSize().x);
+            int centerY =m_game.window().getSize().y/2 + (roomY *  m_game.window().getSize().y);
+             view.setCenter(centerX, centerY);
         
+    }
+    
+    m_game.window().setView(view);
+    
     // draw all Entity textures / animations
     if (m_drawTextures)
     {
