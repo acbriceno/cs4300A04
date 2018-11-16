@@ -29,3 +29,4 @@ Tile RockTR   1  0  22  2 1 1
 Tile RockBL   1  0  23  3 1 1
 Tile RockBM   1  0  24  3 1 1
 Tile RockBR   1  0  25  3 1 1
+Player 640 360 48 48 10
