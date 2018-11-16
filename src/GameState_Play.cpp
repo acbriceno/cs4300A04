@@ -428,62 +428,50 @@ void GameState_Play::sRender()
     roomY =0;
     roomX = 0;
     
-    switch ((int)m_player->getComponent<CTransform>()->pos.x) {
-        case 0 ... 1280:
-            roomX = 0;
-            break;
-        case 1281 ... 2561:
-            roomX = 1;
-            break;
-        case 2562 ... 3842:
-            roomX = 2;
-            break;
-        case 3843 ... 5123:
-            roomX = 3;
-            break;
-        case -1280 ... -1:
-            roomX = -1;
-            break;
-        case -2561 ... -1281:
-            roomX = -2;
-            break;
-        case -3842 ... -2562:
-            roomX = -3;
-            break;
-            
-            
-        default:
-            roomX = 0;
+if (m_player->getComponent<CTransform>()->pos.x >=0 && m_player->getComponent<CTransform>()->pos.x <=1280) {
+        roomX = 0;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >=1281 && m_player->getComponent<CTransform>()->pos.x <=2561) {
+        roomX = 1;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >=2562 && m_player->getComponent<CTransform>()->pos.x <=3842) {
+        roomX = 2;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >=3843 && m_player->getComponent<CTransform>()->pos.x <=5123) {
+        roomX = 3;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >= -1280 && m_player->getComponent<CTransform>()->pos.x <=-1) {
+        roomX = -1;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >= -2561 && m_player->getComponent<CTransform>()->pos.x <= -1281) {
+        roomX = -2;
+    }
+    if (m_player->getComponent<CTransform>()->pos.x >= -3842 && m_player->getComponent<CTransform>()->pos.x <= -2562) {
+        roomX = -3;
     }
     
-    switch ((int)m_player->getComponent<CTransform>()->pos.y) {
-        case 0 ... 768:
-            roomY = 0;
-            break;
-        case 769 ... 1537:
-            roomY = 1;
-            break;
-        case 1538 ... 2306:
-            roomY = 2;
-            break;
-        case 2307 ... 3075:
-            roomY = 3;
-            break;
-        case -768 ... -1:
-            roomY = -1;
-            break;
-        case -1537 ... -769:
-            roomY = -2;
-            break;
-        case -2306 ... -1538:
-            roomY = -3;
-            break;
-
-            
-        default:
-            roomX = 0;
-            roomY = 0;
+    if (m_player->getComponent<CTransform>()->pos.y >=0 && m_player->getComponent<CTransform>()->pos.y <=768) {
+        roomY = 0;
     }
+    if (m_player->getComponent<CTransform>()->pos.y >=769 && m_player->getComponent<CTransform>()->pos.y <=1537) {
+        roomY = 1;
+    }
+    if (m_player->getComponent<CTransform>()->pos.y >=1538 && m_player->getComponent<CTransform>()->pos.y <=2306) {
+        roomY = 2;
+    }
+    if (m_player->getComponent<CTransform>()->pos.y >=2307 && m_player->getComponent<CTransform>()->pos.y <=3075) {
+        roomY = 3;
+    }
+    if (m_player->getComponent<CTransform>()->pos.y >= -768 && m_player->getComponent<CTransform>()->pos.y <= -1) {
+        roomY = -1;
+    }
+    if (m_player->getComponent<CTransform>()->pos.y >= -1537 && m_player->getComponent<CTransform>()->pos.y <= -769) {
+        roomY = -2;
+    }
+    if (m_player->getComponent<CTransform>()->pos.y >= -2306 && m_player->getComponent<CTransform>()->pos.y <= -1538) {
+        roomY = -3;
+    }
+
 
     
     // TODO: set the window view correctly
