@@ -274,23 +274,30 @@ void GameState_Play::sCollision()
 			m_player->getComponent<CTransform>()->pos -= (m_player->getComponent<CTransform>()->facing * overlap);
 		}
 	}
-	//npc touches tile - go around it
-	for (auto npc : m_entityManager.getEntities("npc"))
-	{
-		for (auto tile : m_entityManager.getEntities("tile"))
-		{
-			Vec2 overlap = Physics::GetOverlap(tile, npc);
-
-			if (overlap.x > 0 && overlap.y > 0 && tile->getComponent<CBoundingBox>()->blockMove)
-			{
-
-				npc->getComponent<CTransform>()->pos -= (npc->getComponent<CTransform>()->facing * overlap);
-			}
-
-			
-
-		}
-	}
+	
+    for (auto tile : m_entityManager.getEntities("tile"))
+    {
+        for(auto npc: m_entityManager.getEntities("npc"))
+        {
+            Vec2 overlap = Physics::GetOverlap(tile, npc);
+            if (overlap.x > 0 && overlap.y > 0)
+            {
+                Vec2 prevPos = npc->getComponent<CTransform>()->pos - npc->getComponent<CTransform>()->speed;
+                Vec2 prevOv = Physics::GetOverlap(tile, npc, prevPos);
+                if (prevOv.x > 0)
+                {
+                    if(npc->getComponent<CTransform>()->pos.x > tile->getComponent<CTransform>()->pos.x)
+                    {
+                        npc->getComponent<CTransform>()->pos.x += (overlap.x);
+                    }
+                    else
+                    {
+                        npc->getComponent<CTransform>()->pos.x -= (overlap.x);
+                    }
+                }
+            }
+        }
+    }
 	
 	for (auto npc : m_entityManager.getEntities("npc"))
        {
