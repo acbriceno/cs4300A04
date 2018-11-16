@@ -25,6 +25,8 @@ protected:
     bool                    m_drawTextures = true;
     bool                    m_drawCollision = false;
     bool                    m_follow = false;
+    int                     roomX = 0;
+    int                     roomY = 0;
     
     void init(const std::string & levelPath);
 
