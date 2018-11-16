@@ -217,12 +217,15 @@ void GameState_Play::sAI()
 			speed = e->getComponent<CFollowPlayer>()->speed;
 			for (auto t : m_entityManager.getEntities())
 			{
-				if (t->getComponent<CBoundingBox>()->blockVision && t != e && t != m_player)
+				if (t->hasComponent<CBoundingBox>())
 				{
-					if (Physics::EntityIntersect(m_player->getComponent<CTransform>()->pos, eTransform->pos, t))
+					if (t->getComponent<CBoundingBox>()->blockVision && t != e && t != m_player)
 					{
-						cansee = false;
-						break;
+						if (Physics::EntityIntersect(m_player->getComponent<CTransform>()->pos, eTransform->pos, t))
+						{
+							cansee = false;
+							break;
+						}
 					}
 				}
 			}
