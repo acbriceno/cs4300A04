@@ -16,6 +16,18 @@ Vec2 Physics::GetPreviousOverlap(std::shared_ptr<Entity> a, std::shared_ptr<Enti
     return Vec2(0, 0);
 }
 
+Vec2 Physics::GetOverlap(std::shared_ptr<Entity> a, std::shared_ptr<Entity> b, Vec2 pos)
+{
+    // TODO: Returns the overlap rectangle between the bounding boxes of entities a and b
+    
+    Vec2 delta(abs((a->getComponent<CTransform>()->pos.x) - (pos.x)), (abs((a->getComponent<CTransform>()->pos.y) - (pos.y))));
+    
+    float ox = (a->getComponent<CBoundingBox>()->halfSize.x) + (b->getComponent<CBoundingBox>()->halfSize.x) - delta.x;
+    float oy = (a->getComponent<CBoundingBox>()->halfSize.y) + (b->getComponent<CBoundingBox>()->halfSize.y) - delta.y;
+    
+    return Vec2(ox, oy);
+}
+
 Intersect Physics::LineIntersect(const Vec2 & a, const Vec2 & b, const Vec2 & c, const Vec2 & d)
 {    
 	Vec2 r = (b - a);
