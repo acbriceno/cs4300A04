@@ -305,7 +305,7 @@ void GameState_Play::sCollision()
                 std::cout<<npc->getComponent<CAnimation>()->animation.getName();
                 tempNPC->addComponent<CTransform>(pos);
                 tempNPC->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
-                tempNPC->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("Explosion").getSize(), true, true);
+                tempNPC->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("Explosion").getSize(), false,false);
 
             }
         }
