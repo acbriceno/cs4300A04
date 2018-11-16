@@ -291,6 +291,36 @@ void GameState_Play::sCollision()
 
 		}
 	}
+	
+	for (auto npc : m_entityManager.getEntities("npc"))
+       {
+        for (auto sword : m_entityManager.getEntities("sword"))
+        {
+            Vec2 overlap = Physics::GetOverlap(npc, sword);
+            if (overlap.x > 0 && overlap.y > 0)
+            {
+                auto tempNPC = m_entityManager.addEntity("tile");
+                Vec2 pos(npc->getComponent<CTransform>()->pos);
+                npc->destroy();
+                std::cout<<npc->getComponent<CAnimation>()->animation.getName();
+                tempNPC->addComponent<CTransform>(pos);
+                tempNPC->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
+                tempNPC->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("Explosion").getSize(), true, true);
+
+            }
+        }
+        
+        for (auto player : m_entityManager.getEntities("player"))
+        {
+            Vec2 overlap = Physics::GetOverlap(npc, player);
+            if (overlap.x > 0 && overlap.y > 0)
+            {
+                m_player->getComponent<CTransform>()->pos.x = m_playerConfig.X;
+                m_player->getComponent<CTransform>()->pos.y = m_playerConfig.Y;
+            }
+        }
+        
+    }
 }
 
 void GameState_Play::sAnimation()
