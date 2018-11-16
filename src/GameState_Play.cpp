@@ -266,68 +266,81 @@ void GameState_Play::sLifespan()
 void GameState_Play::sCollision()
 {
 	auto pTransform = m_player->getComponent<CTransform>();
-	for (auto tile : m_entityManager.getEntities("tile"))
+	
+	for (auto e : m_entityManager.getEntities("npc"))
 	{
-		Vec2 overlap = Physics::GetOverlap(tile, m_player);
-		if (overlap.x > 0 && overlap.y > 0 && tile->getComponent<CBoundingBox>()->blockMove)
+		for (auto tile : m_entityManager.getEntities())
 		{
-			m_player->getComponent<CTransform>()->pos -= (m_player->getComponent<CTransform>()->facing * overlap);
-		}
-	}
-	
-    for (auto tile : m_entityManager.getEntities("tile"))
-    {
-        for(auto npc: m_entityManager.getEntities("npc"))
-        {
-            Vec2 overlap = Physics::GetOverlap(tile, npc);
-            if (overlap.x > 0 && overlap.y > 0)
-            {
-                Vec2 prevPos = npc->getComponent<CTransform>()->pos - npc->getComponent<CTransform>()->speed;
-                Vec2 prevOv = Physics::GetOverlap(tile, npc, prevPos);
-                if (prevOv.x > 0)
-                {
-                    if(npc->getComponent<CTransform>()->pos.x > tile->getComponent<CTransform>()->pos.x)
-                    {
-                        npc->getComponent<CTransform>()->pos.x += (overlap.x);
-                    }
-                    else
-                    {
-                        npc->getComponent<CTransform>()->pos.x -= (overlap.x);
-                    }
-                }
-            }
-        }
-    }
-	
-	for (auto npc : m_entityManager.getEntities("npc"))
-       {
-        for (auto sword : m_entityManager.getEntities("sword"))
-        {
-            Vec2 overlap = Physics::GetOverlap(npc, sword);
-            if (overlap.x > 0 && overlap.y > 0)
-            {
-                auto tempNPC = m_entityManager.addEntity("tile");
-                Vec2 pos(npc->getComponent<CTransform>()->pos);
-                npc->destroy();
-                std::cout<<npc->getComponent<CAnimation>()->animation.getName();
-                tempNPC->addComponent<CTransform>(pos);
-                tempNPC->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
-                tempNPC->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("Explosion").getSize(), false,false);
+			if (tile->tag() == "tile")
+			{
+				Vec2 pOverlap = Physics::GetOverlap(tile, m_player);
+				if (pOverlap.x > 0 && pOverlap.y > 0 && tile->getComponent<CBoundingBox>()->blockMove)
+				{
+					m_player->getComponent<CTransform>()->pos -= (m_player->getComponent<CTransform>()->facing * pOverlap);
+				}
+				Vec2 eOverlap = Physics::GetOverlap(tile, e);
+				if (eOverlap.x > 0 && eOverlap.y > 0 && tile->getComponent<CBoundingBox>()->blockMove)
+				{
+					Vec2 tOverlap = Physics::GetPreviousOverlap(tile, e);
 
-            }
-        }
-        
-        for (auto player : m_entityManager.getEntities("player"))
-        {
-            Vec2 overlap = Physics::GetOverlap(npc, player);
-            if (overlap.x > 0 && overlap.y > 0)
-            {
-                m_player->getComponent<CTransform>()->pos.x = m_playerConfig.X;
-                m_player->getComponent<CTransform>()->pos.y = m_playerConfig.Y;
-            }
-        }
-        
-    }
+					if (tOverlap.x <= 0)
+					{
+
+						if (e->getComponent<CTransform>()->speed.x <= 0)
+						{
+							e->getComponent<CTransform>()->pos.x += eOverlap.x;
+						}
+						else
+						{
+							e->getComponent<CTransform>()->pos.x -= eOverlap.x;
+						}
+
+					}
+					else
+					{
+
+						if (e->getComponent<CTransform>()->speed.y <= 0)
+						{
+							e->getComponent<CTransform>()->pos.y += eOverlap.y;
+						}
+						else
+						{
+							e->getComponent<CTransform>()->pos.y -= eOverlap.y;
+						}
+
+					}
+
+
+				}
+			}
+			if (tile->tag() == "sword")
+			{
+				Vec2 overlap = Physics::GetOverlap(tile, e);
+				if (overlap.x > 0 && overlap.y > 0)
+				{
+					auto exp = m_entityManager.addEntity("explosion");
+					//auto pTransform = m_player->getComponent<CTransform>();
+					exp->addComponent<CTransform>()->pos = e->getComponent<CTransform>()->pos;
+					//exp->getComponent<CTransform>()->facing = eTransform->facing;
+					//sword->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("SwordUp").getSize(), false, false);
+					exp->addComponent<CAnimation>(m_game.getAssets().getAnimation("Explosion"), false);
+					e->destroy();
+				}
+			}
+			if (tile->tag() == "player")
+			{
+				Vec2 overlap = Physics::GetOverlap(tile, e);
+				if (overlap.x > 0 && overlap.y > 0)
+				{
+					m_player->destroy();
+					spawnPlayer();
+				}
+			}
+		}
+		
+
+		
+	}
 }
 
 void GameState_Play::sAnimation()
