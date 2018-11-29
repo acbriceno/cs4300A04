@@ -350,17 +350,18 @@ void GameState_Play::sCollision()
 }
 
 void GameState_Play::sDrag(){
-    auto pDraggable = m_player->getComponent<CDraggable>()->draggable;
-    pDraggable = Physics::PointInBounds(mousePosition, m_player);
-    
 
-    if(mouseClickReleased){
-        std::cout<<"player moved";
+    if(mouseClicked)
+    {
+        m_player->getComponent<CDraggable>()->draggable = Physics::PointInBounds(mousePosition, m_player);
+     
+    }
+    if(mouseClickReleased && m_player->getComponent<CDraggable>()->draggable)
+    {
         m_player->getComponent<CTransform>()->pos.x = mousePosition.x;
         m_player->getComponent<CTransform>()->pos.y = mousePosition.y;
         mouseClickReleased = false;
     }
-    
     
 }
 
@@ -463,13 +464,13 @@ void GameState_Play::sUserInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                std::cout << "Left Mouse Button Clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
-                std::cout << "Player Entity at (" << m_player->getComponent<CTransform>()->pos.x << "," << m_player->getComponent<CTransform>()->pos.x << ")\n";
-                std::cout << "Player Entity Bounding BOX at (" << m_player->getComponent<CBoundingBox>()->halfSize.x << "," <<  m_player->getComponent<CBoundingBox>()->halfSize.y << ")\n";
+//                std::cout << "Left Mouse Button Clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+//                std::cout << "Player Entity at (" << m_player->getComponent<CTransform>()->pos.x << "," << m_player->getComponent<CTransform>()->pos.x << ")\n";
+//                std::cout << "Player Entity Bounding BOX at (" << m_player->getComponent<CBoundingBox>()->halfSize.x << "," <<  m_player->getComponent<CBoundingBox>()->halfSize.y << ")\n";
                 mouseClicked = true;
                 mousePosition.x = event.mouseButton.x;
                 mousePosition.y = event.mouseButton.y;
-                //mouseClickReleased = false;
+
                 
                 
                 
@@ -480,11 +481,13 @@ void GameState_Play::sUserInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                std::cout << "Left Mouse Button Released at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+//                std::cout << "Left Mouse Button Released at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
                 mousePosition.x = event.mouseButton.x;
                 mousePosition.y = event.mouseButton.y;
+                mouseClicked = false;
                 mouseClickReleased = true;
-               // mouseClicked = false;
+
+
                 
             }
             
