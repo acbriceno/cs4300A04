@@ -91,6 +91,7 @@ void GameState_Play::spawnPlayer()
 	Vec2 BB(m_playerConfig.CX, m_playerConfig.CY);
 	m_player->addComponent<CBoundingBox>(BB, false, false);
 	m_player->addComponent<CState>("Stand");
+	m_player->addComponent<CDraggable>();
 }
 
 void GameState_Play::spawnSword(std::shared_ptr<Entity> entity)
@@ -102,6 +103,7 @@ void GameState_Play::spawnSword(std::shared_ptr<Entity> entity)
 	sword->getComponent<CTransform>()->facing = eTransform->facing;
 	sword->addComponent<CBoundingBox>(m_game.getAssets().getAnimation("SwordUp").getSize(), false, false);
 	sword->addComponent<CLifeSpan>(150);
+	
 }
 
 void GameState_Play::update()
@@ -114,6 +116,7 @@ void GameState_Play::update()
         sMovement();
         sLifespan();
         sCollision();
+	sDrag();
         sAnimation();
     }
 
@@ -346,6 +349,21 @@ void GameState_Play::sCollision()
 	}
 }
 
+void GameState_Play::sDrag(){
+    auto pDraggable = m_player->getComponent<CDraggable>()->draggable;
+    pDraggable = Physics::PointInBounds(mousePosition, m_player);
+    
+
+    if(mouseClickReleased){
+        std::cout<<"player moved";
+        m_player->getComponent<CTransform>()->pos.x = mousePosition.x;
+        m_player->getComponent<CTransform>()->pos.y = mousePosition.y;
+        mouseClickReleased = false;
+    }
+    
+    
+}
+
 void GameState_Play::sAnimation()
 {
 	auto pTransform = m_player->getComponent<CTransform>();
@@ -440,6 +458,36 @@ void GameState_Play::sUserInput()
                 case sf::Keyboard::D:       { pInput->right = false; break; }
                 case sf::Keyboard::Space:   { pInput->shoot = false; pInput->canShoot = true; break; }
             }
+        }
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                std::cout << "Left Mouse Button Clicked at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+                std::cout << "Player Entity at (" << m_player->getComponent<CTransform>()->pos.x << "," << m_player->getComponent<CTransform>()->pos.x << ")\n";
+                std::cout << "Player Entity Bounding BOX at (" << m_player->getComponent<CBoundingBox>()->halfSize.x << "," <<  m_player->getComponent<CBoundingBox>()->halfSize.y << ")\n";
+                mouseClicked = true;
+                mousePosition.x = event.mouseButton.x;
+                mousePosition.y = event.mouseButton.y;
+                //mouseClickReleased = false;
+                
+                
+                
+            }
+            
+        }
+        if (event.type == sf::Event::MouseButtonReleased)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                std::cout << "Left Mouse Button Released at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+                mousePosition.x = event.mouseButton.x;
+                mousePosition.y = event.mouseButton.y;
+                mouseClickReleased = true;
+               // mouseClicked = false;
+                
+            }
+            
         }
     }
 }
