@@ -53,3 +53,10 @@ bool Physics::EntityIntersect(const Vec2 & a, const Vec2 & b, std::shared_ptr<En
 	if (v1.result || v2.result || v3.result || v4.result) { return true; }
 	else { return false; }
 }
+
+bool Physics:: PointInBounds(Vec2 mousePosition, std::shared_ptr<Entity> player)
+{
+    
+    return !(mousePosition.x < (player->getComponent<CTransform>()->pos.x - player->getComponent<CBoundingBox>()->halfSize.x) || mousePosition.x > (player->getComponent<CTransform>()->pos.x + player->getComponent<CBoundingBox>()->halfSize.x) || mousePosition.y < (player->getComponent<CTransform>()->pos.y - player->getComponent<CBoundingBox>()->halfSize.y) || mousePosition.y > (player->getComponent<CTransform>()->pos.y + player->getComponent<CBoundingBox>()->halfSize.y));
+    
+}
