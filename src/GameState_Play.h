@@ -27,6 +27,9 @@ protected:
     bool                    m_follow = false;
     int                     roomX = 0;
     int                     roomY = 0;
+    bool                    mouseClicked = false;
+    bool                    mouseClickReleased = false;
+    Vec2                    mousePosition = Vec2(0,0);
     
     void init(const std::string & levelPath);
 
