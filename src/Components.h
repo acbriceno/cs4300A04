@@ -109,3 +109,15 @@ public:
     float speed = 0;
     CPatrol(std::vector<Vec2> & pos, float s) : positions(pos), speed(s) {}
 };
+
+class CDraggable : public Component
+{
+public:
+    
+    Vec2 position;
+    Vec2 newPosition;
+    bool draggable = false;
+    
+    CDraggable(){}
+    
+};
