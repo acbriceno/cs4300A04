@@ -46,6 +46,7 @@ protected:
     void sAnimation();
     void sCollision();
     void sRender();
+    void sDrag();
 
 public:
 
