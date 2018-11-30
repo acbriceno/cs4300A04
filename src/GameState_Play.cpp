@@ -350,20 +350,39 @@ void GameState_Play::sCollision()
 }
 
 void GameState_Play::sDrag(){
-
-    if(mouseClicked)
-    {
+    
+    if (mouseClicked && !selected) {
+   
         m_player->getComponent<CDraggable>()->draggable = Physics::PointInBounds(mousePosition, m_player);
-     
+        selected =  m_player->getComponent<CDraggable>()->draggable;
+        mouseClicked = false;
     }
-    if(mouseClickReleased && m_player->getComponent<CDraggable>()->draggable)
+    
+    if(mouseClicked && m_player->getComponent<CDraggable>()->draggable )
     {
         m_player->getComponent<CTransform>()->pos.x = mousePosition.x;
         m_player->getComponent<CTransform>()->pos.y = mousePosition.y;
-        mouseClickReleased = false;
+        m_player->getComponent<CDraggable>()->draggable = false;
+        mouseClicked = false;
+        selected = false;
     }
     
+    
+//Drag and Hold
+//    if(mouseClicked)
+//    {
+//        m_player->getComponent<CDraggable>()->draggable = Physics::PointInBounds(mousePosition, m_player);
+//
+//    }
+//    if(mouseClickReleased && m_player->getComponent<CDraggable>()->draggable)
+//    {
+//        m_player->getComponent<CTransform>()->pos.x = mousePosition.x;
+//        m_player->getComponent<CTransform>()->pos.y = mousePosition.y;
+//        mouseClickReleased = false;
+//    }
+    
 }
+
 
 void GameState_Play::sAnimation()
 {
@@ -470,10 +489,7 @@ void GameState_Play::sUserInput()
                 mouseClicked = true;
                 mousePosition.x = event.mouseButton.x;
                 mousePosition.y = event.mouseButton.y;
-
-                
-                
-                
+    
             }
             
         }
@@ -481,14 +497,12 @@ void GameState_Play::sUserInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
+// Drag and Hold
 //                std::cout << "Left Mouse Button Released at (" << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
-                mousePosition.x = event.mouseButton.x;
-                mousePosition.y = event.mouseButton.y;
-                mouseClicked = false;
-                mouseClickReleased = true;
-
-
-                
+//                mousePosition.x = event.mouseButton.x;
+//                mousePosition.y = event.mouseButton.y;
+//                mouseClicked = false;
+//                  mouseClickReleased = true;
             }
             
         }
