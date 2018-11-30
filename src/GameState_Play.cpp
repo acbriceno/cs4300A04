@@ -351,20 +351,28 @@ void GameState_Play::sCollision()
 
 void GameState_Play::sDrag(){
     
-    if (mouseClicked && !selected) {
-   
-        m_player->getComponent<CDraggable>()->draggable = Physics::PointInBounds(mousePosition, m_player);
-        selected =  m_player->getComponent<CDraggable>()->draggable;
-        mouseClicked = false;
-    }
-    
-    if(mouseClicked && m_player->getComponent<CDraggable>()->draggable )
+    for( auto entity : m_entityManager.getEntities())
     {
-        m_player->getComponent<CTransform>()->pos.x = mousePosition.x;
-        m_player->getComponent<CTransform>()->pos.y = mousePosition.y;
-        m_player->getComponent<CDraggable>()->draggable = false;
-        mouseClicked = false;
-        selected = false;
+        if (entity->hasComponent<CDraggable>())
+        {
+            if (mouseClicked && !selected)
+            {
+                entity->getComponent<CDraggable>()->draggable = Physics::PointInBounds(mousePosition, entity);
+                selected =  entity->getComponent<CDraggable>()->draggable;
+                mouseClicked = false;
+                
+            }
+            
+            if(mouseClicked && entity->getComponent<CDraggable>()->draggable )
+            {
+                entity->getComponent<CTransform>()->pos.x = mousePosition.x;
+                entity->getComponent<CTransform>()->pos.y = mousePosition.y;
+                entity->getComponent<CDraggable>()->draggable = false;
+                mouseClicked = false;
+                selected = false;
+            }
+            
+        }
     }
     
     
